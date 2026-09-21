@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05031a">
+<title>Para Alejandra, con flores amarillas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Pinyon+Script&display=swap">
+<style>
+/* Diseño nocturno fijo: una galaxia siempre es oscura, así que los tokens
+   no cambian con el tema del visor y el fondo se declara de forma explícita. */
+:root{
+  color-scheme: dark;
+  --space-0:#05031a;
+  --space-1:#140b38;
+  --nebula-violet:rgba(96,66,196,.55);
+  --nebula-rose:rgba(160,60,144,.34);
+  --core-glow:rgba(255,176,44,.22);
+  --gold:#ffd23f;
+  --cream:#fff4cf;
+  --ink:#fff8e3;
+  --shade:rgba(5,3,26,.92);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);background:var(--space-0)}
+body{
+  height:100%;margin:0;overflow:hidden;background:var(--space-0);color:var(--ink);
+  font-family:'Cormorant Garamond','Iowan Old Style','Palatino Linotype',Georgia,serif;
+  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;
+}
+
+/* Cielo: nebulosa violeta arriba, rosa abajo y un fulgor dorado en el centro */
+.sky{
+  position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(70% 50% at 50% 52%,var(--core-glow),rgba(255,176,44,0) 65%),
+    radial-gradient(90% 60% at 12% 8%,var(--nebula-violet),rgba(96,66,196,0) 70%),
+    radial-gradient(80% 55% at 92% 92%,var(--nebula-rose),rgba(160,60,144,0) 65%),
+    linear-gradient(180deg,var(--space-1),var(--space-0) 70%);
+}
+#galaxia{
+  position:fixed;inset:0;z-index:1;display:block;
+  touch-action:none;cursor:grab;
+}
+#galaxia:active{cursor:grabbing}
+
+.ui{
+  position:fixed;inset:0;z-index:2;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  padding:
+    calc(env(safe-area-inset-top,0px) + clamp(1.5rem,6vh,3.5rem))
+    1.25rem
+    calc(env(safe-area-inset-bottom,0px) + clamp(1.25rem,5vh,3rem));
+  text-align:center;pointer-events:none;
+}
+
+.title{
+  margin:0;font-weight:400;line-height:1.05;
+  font-family:'Pinyon Script','Snell Roundhand','Segoe Script','Brush Script MT',cursive;
+  font-size:clamp(3rem,14.5vw,7rem);
+  color:var(--cream);
+  text-shadow:0 0 28px rgba(255,190,60,.55),0 0 2px rgba(255,255,255,.45),0 2px 18px var(--shade);
+}
+.sub{
+  margin:.4rem 0 0;font-style:italic;font-weight:500;
+  font-size:clamp(1.05rem,4.4vw,1.5rem);letter-spacing:.02em;
+  color:var(--gold);text-shadow:0 1px 12px var(--shade),0 0 20px var(--shade);
+}
+
+.bottom{
+  display:flex;flex-direction:column;align-items:center;gap:1rem;
+  width:100%;max-width:34rem;
+}
+.msg{
+  margin:0;min-height:4.6em;display:flex;align-items:center;justify-content:center;
+  font-style:italic;font-weight:600;line-height:1.35;white-space:pre-line;
+  font-size:clamp(1.2rem,5vw,1.75rem);text-wrap:balance;
+  color:var(--ink);text-shadow:0 1px 14px var(--shade),0 0 30px var(--shade);
+  transition:opacity .9s ease,transform .9s ease,filter .9s ease;
+}
+.msg.out{opacity:0;transform:translateY(8px);filter:blur(3px)}
+
+.next{
+  pointer-events:auto;font:inherit;font-style:italic;font-weight:600;font-size:1.05rem;
+  color:var(--cream);background:rgba(255,210,63,.10);
+  border:1px solid rgba(255,225,130,.42);border-radius:999px;
+  padding:.55rem 1.3rem;cursor:pointer;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  transition:background .2s ease,transform .2s ease;
+}
+.next:hover{background:rgba(255,210,63,.22)}
+.next:active{transform:scale(.97)}
+.next:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.tip{
+  margin:0;font-style:italic;font-size:.95rem;color:rgba(255,248,227,.62);
+  text-shadow:0 1px 10px var(--shade);transition:opacity .8s ease;
+}
+.tip.gone{opacity:0}
+
+/* Una sola secuencia de entrada: primero florece la galaxia, luego el título, luego el mensaje */
+@keyframes rise{
+  from{opacity:0;filter:blur(10px);transform:scale(.96)}
+  to{opacity:1;filter:blur(0);transform:none}
+}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.top{animation:rise 2.2s cubic-bezier(.2,.7,.2,1) 1.6s both}
+.bottom{animation:fadein 1.6s ease 3s both}
+
+@media (max-height:520px){
+  .title{font-size:clamp(2.2rem,9vw,4rem)}
+  .msg{min-height:3.2em;font-size:1.1rem}
+  .tip{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .top,.bottom{animation:none}
+  .msg{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true"></div>
+<canvas id="galaxia" role="img" aria-label="Una galaxia de flores amarillas que gira despacio"></canvas>
+
+<main class="ui">
+  <header class="top">
+    <h1 id="para" class="title">Para Alejandra</h1>
+    <p class="sub">Feliz Día de las Flores Amarillas</p>
+  </header>
+  <section class="bottom">
+    <p id="msg" class="msg" aria-live="polite"></p>
+    <button id="next" class="next" type="button">Toca para seguir</button>
+    <p id="tip" class="tip">Arrastra para girar la galaxia</p>
+  </section>
+</main>
+<noscript>Activa JavaScript para ver la galaxia de flores amarillas.</noscript>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- Personaliza aquí ---------- */
+const PARA = 'Alejandra';
+const DE = 'Abel';   // pon tu nombre entre comillas para firmar, por ejemplo 'Carlos'
+const MENSAJES = [
+  'El Día de las Flores Amarillas me pareció una buena excusa para hacerte esto.',
+  'Nada serio, solo un detalle. Bueno, un detalle de otra galaxia.',
+  'Dicen que el amarillo trae buena suerte y alegría, así que te mando un poco de las dos.',
+  'Gírala y busca tu flor favorita, a ver cuál eliges.',
+  'Ojalá tu día sea tan luminoso como esta galaxia, {nombre}.',
+  'Feliz Día de las Flores Amarillas 🌻'
+];
+/* --------------------------------------- */
+
+const $ = id => document.getElementById(id);
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const rnd = Math.random, TAU = Math.PI * 2;
+const gauss = () => (rnd() + rnd() + rnd() + rnd() - 2) / 2;
+const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+const easeOutBack = t => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+const texts = MENSAJES.map(m => m.replace('{nombre}', PARA));
+if (DE) texts[texts.length - 1] += '\n\u2014 ' + DE;
+$('para').textContent = 'Para ' + PARA;
+document.title = 'Para ' + PARA + ', con flores amarillas';
+
+/* ---------- Lienzo ---------- */
+const cv = $('galaxia'), ctx = cv.getContext('2d');
+let W = 0, H = 0, dpr = 1, cx = 0, cy = 0, R = 300, FS = 300;
+const D = 3.2;                       // distancia de la cámara, en radios de galaxia
+
+function resize(){
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  cx = W / 2; cy = H * 0.52;
+  R = Math.min(W * 0.58, H * 0.56);
+  FS = Math.min(R, 300);
+}
+resize();
+window.addEventListener('resize', resize);
+
+/* ---------- Sprites ---------- */
+function petalPath(g, len, wid){
+  g.beginPath();
+  g.moveTo(0, 0);
+  g.bezierCurveTo(wid, len * 0.28, wid * 0.95, len * 0.78, 0, len);
+  g.bezierCurveTo(-wid * 0.95, len * 0.78, -wid, len * 0.28, 0, 0);
+  g.closePath();
+}
+function makeGlow(rgb){
+  const s = 128, c = document.createElement('canvas'); c.width = c.height = s;
+  const g = c.getContext('2d');
+  const gr = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+  gr.addColorStop(0, 'rgba(' + rgb + ',1)');
+  gr.addColorStop(0.2, 'rgba(' + rgb + ',.55)');
+  gr.addColorStop(0.55, 'rgba(' + rgb + ',.12)');
+  gr.addColorStop(1, 'rgba(' + rgb + ',0)');
+  g.fillStyle = gr; g.fillRect(0, 0, s, s);
+  return c;
+}
+/* kind 0: girasol · 1: margarita amarilla · 2: flor de cinco pétalos */
+function makeFlower(kind){
+  const S = 192, P = S * 0.33;
+  const c = document.createElement('canvas'); c.width = c.height = S;
+  const g = c.getContext('2d');
+  g.translate(S / 2, S / 2);
+
+  const halo = g.createRadialGradient(0, 0, P * 0.5, 0, 0, S / 2);
+  halo.addColorStop(0, 'rgba(255,208,60,.32)'); halo.addColorStop(1, 'rgba(255,208,60,0)');
+  g.fillStyle = halo; g.beginPath(); g.arc(0, 0, S / 2, 0, TAU); g.fill();
+
+  const layers = kind === 0 ? [[15, P, 0.20, 0], [15, P * 0.82, 0.19, Math.PI / 15]]
+               : kind === 1 ? [[9, P, 0.42, 0], [9, P * 0.8, 0.38, Math.PI / 9]]
+               : [[5, P, 0.62, 0.3]];
+  layers.forEach((L, li) => {
+    const n = L[0], len = L[1], wf = L[2], off = L[3];
+    for (let i = 0; i < n; i++){
+      g.save(); g.rotate(off + i * TAU / n);
+      petalPath(g, len, len * wf);
+      const lg = g.createLinearGradient(0, 0, 0, len);
+      if (li === 0){ lg.addColorStop(0, '#e58a00'); lg.addColorStop(0.45, '#ffc20a'); lg.addColorStop(1, '#ffe25c'); }
+      else { lg.addColorStop(0, '#c97400'); lg.addColorStop(0.5, '#ffb400'); lg.addColorStop(1, '#ffd52e'); }
+      g.fillStyle = lg; g.fill();
+      g.lineWidth = 1; g.strokeStyle = 'rgba(150,75,0,.30)'; g.stroke();
+      g.restore();
+    }
+  });
+
+  if (kind === 0){
+    const cr = P * 0.36;
+    const cg = g.createRadialGradient(0, 0, 0, 0, 0, cr);
+    cg.addColorStop(0, '#5a2a05'); cg.addColorStop(0.7, '#3b1a03'); cg.addColorStop(1, '#7a4a0c');
+    g.fillStyle = cg; g.beginPath(); g.arc(0, 0, cr, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(214,150,50,.75)';
+    for (let k = 1; k < 46; k++){
+      const rr = Math.sqrt(k) * cr * 0.145, aa = k * 2.39996;
+      g.beginPath(); g.arc(Math.cos(aa) * rr, Math.sin(aa) * rr, 1.5, 0, TAU); g.fill();
+    }
+  } else if (kind === 1){
+    const cr = P * 0.21;
+    const cg = g.createRadialGradient(-cr * 0.3, -cr * 0.3, 0, 0, 0, cr);
+    cg.addColorStop(0, '#ffe58a'); cg.addColorStop(1, '#ef8b00');
+    g.fillStyle = cg; g.beginPath(); g.arc(0, 0, cr, 0, TAU); g.fill();
+  } else {
+    const cr = P * 0.17;
+    g.fillStyle = '#fff3a8'; g.beginPath(); g.arc(0, 0, cr, 0, TAU); g.fill();
+    g.fillStyle = '#e28a00';
+    for (let k = 0; k < 12; k++){
+      const aa = k * TAU / 12;
+      g.beginPath(); g.arc(Math.cos(aa) * cr * 0.78, Math.sin(aa) * cr * 0.78, 1.7, 0, TAU); g.fill();
+    }
+  }
+  return c;
+}
+const SPR_WARM = makeGlow('255,205,90'), SPR_CREAM = makeGlow('255,244,210'), SPR_COOL = makeGlow('170,190,255');
+const SPR_FLOWER = [makeFlower(0), makeFlower(1), makeFlower(2)];
+const FLOWER_K = 1 / 0.33;           // ancho del sprite = radio del pétalo / 0.33
+
+/* ---------- Geometría de la galaxia ---------- */
+const ARMS = 3, TWIST = 4.4;
+const BUCKET_COLORS = ['#fff4cf', '#ffd84a', '#ffab2e', '#b8a3ff', '#9ec5ff'];
+const BUCKET_ALPHA = [0.95, 0.9, 0.85, 0.8, 0.8];
+function pickBucket(r){
+  const w = r < 0.35 ? [.40, .35, .22, .02, .01] : r < 0.7 ? [.30, .32, .13, .12, .13] : [.26, .24, .06, .20, .24];
+  const x = rnd(); let acc = 0;
+  for (let i = 0; i < 5; i++){ acc += w[i]; if (x < acc) return i; }
+  return 0;
+}
+function spiralPoint(rp, sig){
+  const r = Math.pow(rnd(), rp) * 0.985 + 0.004;
+  const arm = (rnd() * ARMS) | 0;
+  const a = arm * (TAU / ARMS) + TWIST * r + gauss() * sig * (0.55 + 0.5 * r);
+  return [Math.cos(a) * r, Math.sin(a) * r, r];
+}
+
+/* Estrellas */
+const NS = (W * H > 600000) ? 4200 : 3000;
+const SX = new Float32Array(NS), SY = new Float32Array(NS), SZ = new Float32Array(NS);
+const SS = new Float32Array(NS), SP = new Float32Array(NS);
+const buckets = [[], [], [], [], []];
+for (let i = 0; i < NS; i++){
+  let x, y, z, r;
+  if (rnd() < 0.14){                                   // bulbo central
+    r = Math.pow(rnd(), 2) * 0.3;
+    const a = rnd() * TAU;
+    x = Math.cos(a) * r; z = Math.sin(a) * r; y = gauss() * 0.12 * (1 - r);
+  } else {
+    r = Math.pow(rnd(), 1.4) * 0.985 + 0.004;
+    const a = rnd() < 0.2 ? rnd() * TAU                // estrellas sueltas entre brazos
+      : ((rnd() * ARMS) | 0) * (TAU / ARMS) + TWIST * r + gauss() * (0.55 + 0.5 * r);
+    x = Math.cos(a) * r; z = Math.sin(a) * r; y = gauss() * 0.055 * (1 - 0.7 * r);
+  }
+  SX[i] = x; SY[i] = y; SZ[i] = z;
+  SS[i] = 0.55 + Math.pow(rnd(), 3.2) * 2.1;
+  SP[i] = rnd() * TAU;
+  buckets[pickBucket(Math.abs(r))].push(i);
+}
+
+/* Estrellas brillantes con halo */
+const glowStars = [];
+for (let i = 0; i < 90; i++){
+  const p = spiralPoint(1.2, 1);
+  glowStars.push({
+    x: p[0], z: p[1], y: gauss() * 0.05, s: 9 + rnd() * 20, a: 0.35 + rnd() * 0.5, ph: rnd() * TAU,
+    spr: p[2] > 0.55 && rnd() < 0.5 ? SPR_COOL : (rnd() < 0.5 ? SPR_WARM : SPR_CREAM)
+  });
+}
+
+/* Flores */
+function buildFlowers(n){
+  const fl = []; let guard = 0;
+  while (fl.length < n && guard++ < n * 40){
+    const p = spiralPoint(0.85, 0.75), x = p[0], z = p[1], r = p[2];
+    if (r < 0.14 || r > 0.95) continue;
+    let ok = true;
+    for (let k = 0; k < fl.length; k++){
+      const dx = fl[k].x - x, dz = fl[k].z - z;
+      if (dx * dx + dz * dz < 0.0042){ ok = false; break; }
+    }
+    if (!ok) continue;
+    fl.push({
+      x: x, z: z, y: gauss() * 0.03, r: r, kind: (rnd() * 3) | 0,
+      size: (0.055 + Math.pow(rnd(), 2.2) * 0.085) * (0.62 + 0.38 * r) * 1.15,
+      phi: rnd() * TAU, w: (0.15 + rnd() * 0.45) * (rnd() < 0.5 ? -1 : 1), ph: rnd() * TAU
+    });
+  }
+  return fl;
+}
+const flowers = buildFlowers(clamp(Math.round(R / 3.2), 70, 150));
+const NF = flowers.length;
+const fx = new Float32Array(NF), fy = new Float32Array(NF), fd = new Float32Array(NF), fsc = new Float32Array(NF);
+const order = Array.from({ length: NF }, (_, i) => i);
+
+/* Estrellas lejanas fijas */
+const bgStars = Array.from({ length: 170 }, () => ({
+  x: rnd(), y: rnd(), s: 0.5 + rnd() * 1.3, a: 0.25 + rnd() * 0.65, sp: 0.6 + rnd() * 1.8, ph: rnd() * TAU
+}));
+
+/* ---------- Pétalos al tocar ---------- */
+const petals = [];
+const PETAL_COLORS = ['#ffd83a', '#ffbf1f', '#fff08a'];
+function burst(px, py){
+  for (let i = 0; i < 26; i++){
+    const ang = rnd() * TAU, sp = 60 + rnd() * 260;
+    petals.push({
+      x: px, y: py, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - 90,
+      rot: rnd() * TAU, vr: (rnd() - 0.5) * 8, s: 7 + rnd() * 9,
+      life: 1, decay: 0.28 + rnd() * 0.25, c: PETAL_COLORS[(rnd() * 3) | 0]
+    });
+  }
+  if (petals.length > 260) petals.splice(0, petals.length - 260);
+}
+function drawPetals(dt){
+  ctx.globalCompositeOperation = 'source-over';
+  for (let i = petals.length - 1; i >= 0; i--){
+    const p = petals[i];
+    const drag = Math.pow(0.35, dt);
+    p.vx *= drag; p.vy = p.vy * drag + 160 * dt;
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    p.rot += p.vr * dt; p.life -= p.decay * dt;
+    if (p.life <= 0){ petals.splice(i, 1); continue; }
+    ctx.save();
+    ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+    ctx.globalAlpha = Math.min(1, p.life * 1.6);
+    ctx.fillStyle = p.c;
+    ctx.beginPath(); ctx.ellipse(0, 0, p.s, p.s * 0.42, 0, 0, TAU); ctx.fill();
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+}
+
+/* ---------- Estado e interacción ---------- */
+let yaw = rnd() * TAU, tilt = 0.66, tiltTarget = 0.66, zoom = 1;
+let spinBoost = 0, pulse = 0;
+const baseSpin = reduce ? 0.02 : 0.09;
+
+const tip = $('tip');
+let tipHidden = false;
+function hideTip(){ if (!tipHidden){ tipHidden = true; tip.classList.add('gone'); } }
+
+const msgEl = $('msg');
+let mi = -1, swapT = 0, autoT = 0;
+function showMessage(i){
+  clearTimeout(swapT);
+  msgEl.classList.add('out');
+  swapT = setTimeout(() => { msgEl.textContent = texts[i]; msgEl.classList.remove('out'); }, reduce ? 0 : 600);
+}
+function nextMessage(){
+  mi = (mi + 1) % texts.length;
+  showMessage(mi);
+  clearTimeout(autoT);
+  autoT = setTimeout(nextMessage, clamp(texts[mi].length * 85 + 2600, 5500, 10500));
+}
+function tap(x, y){
+  burst(x, y);
+  pulse = 1; spinBoost += 0.8;
+  nextMessage();
+}
+$('next').addEventListener('click', () => {
+  const b = $('next').getBoundingClientRect();
+  tap(b.left + b.width / 2, b.top);
+});
+
+const ptrs = new Map();
+let dragMoved = 0, downT = 0, tapCandidate = false, pinchD0 = 1, zoom0 = 1;
+cv.addEventListener('pointerdown', e => {
+  try { cv.setPointerCapture(e.pointerId); } catch (_) {}
+  ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (ptrs.size === 1){ dragMoved = 0; downT = performance.now(); tapCandidate = true; }
+  else {
+    tapCandidate = false; hideTip();
+    const v = Array.from(ptrs.values());
+    pinchD0 = Math.max(1, Math.hypot(v[0].x - v[1].x, v[0].y - v[1].y)); zoom0 = zoom;
+  }
+});
+cv.addEventListener('pointermove', e => {
+  const p = ptrs.get(e.pointerId); if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY;
+  if (ptrs.size === 1){
+    dragMoved += Math.abs(dx) + Math.abs(dy);
+    if (dragMoved > 8){ tapCandidate = false; hideTip(); }
+    yaw += dx * 0.006;
+    spinBoost = clamp(spinBoost * 0.6 + (dx * 0.006 / 0.016) * 0.4, -3.5, 3.5);
+    tiltTarget = clamp(tiltTarget - dy * 0.004, 0.28, 1.3);
+  } else if (ptrs.size === 2){
+    const v = Array.from(ptrs.values());
+    zoom = clamp(zoom0 * Math.hypot(v[0].x - v[1].x, v[0].y - v[1].y) / pinchD0, 0.6, 1.8);
+  }
+});
+function release(e){
+  if (!ptrs.has(e.pointerId)) return;
+  const single = ptrs.size === 1;
+  ptrs.delete(e.pointerId);
+  if (single && tapCandidate && e.type === 'pointerup' && performance.now() - downT < 400) tap(e.clientX, e.clientY);
+  tapCandidate = false;
+}
+cv.addEventListener('pointerup', release);
+cv.addEventListener('pointercancel', release);
+cv.addEventListener('wheel', e => {
+  e.preventDefault();
+  zoom = clamp(zoom * Math.exp(-e.deltaY * 0.0012), 0.6, 1.8);
+}, { passive: false });
+
+/* ---------- Dibujo ---------- */
+function drawCore(Rz, grow, fade, k){
+  ctx.globalCompositeOperation = 'lighter';
+  const layers = [[0.62, 0.26, SPR_WARM], [0.34, 0.5, SPR_WARM], [0.17, 0.85, SPR_CREAM], [0.07, 1, SPR_CREAM]];
+  for (let i = 0; i < layers.length; i++){
+    const dd = 2 * layers[i][0] * Rz * grow * k;
+    ctx.globalAlpha = layers[i][1] * fade;
+    ctx.drawImage(layers[i][2], cx - dd / 2, cy - dd / 2, dd, dd);
+  }
+  ctx.globalCompositeOperation = 'source-over';
+}
+const bloomOf = (r, grow) => {
+  const t = clamp((grow * 1.25 - r * 0.7) / 0.55, 0, 1);
+  return t <= 0 ? 0 : easeOutBack(t);
+};
+
+let last = performance.now();
+const t0 = last;
+function frame(now){
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  const el = (now - t0) / 1000, sec = now / 1000;
+  const grow = reduce ? 1 : easeOutCubic(clamp(el / 4.4, 0, 1));
+  const fade = reduce ? 1 : clamp(el / 1.1, 0, 1);
+
+  spinBoost *= Math.pow(0.15, dt);
+  pulse *= Math.pow(0.03, dt);
+  yaw += (baseSpin + spinBoost) * dt;
+  tilt += (tiltTarget - tilt) * Math.min(1, dt * 6);
+
+  const a = yaw + (reduce ? 0 : (1 - grow) * (1 - grow) * 7);
+  const ca = Math.cos(a), sa = Math.sin(a), ct = Math.cos(tilt), stl = Math.sin(tilt);
+  const Rz = R * zoom, FSz = FS * zoom;
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  ctx.globalCompositeOperation = 'source-over';
+
+  /* estrellas lejanas */
+  ctx.fillStyle = '#fff6df';
+  for (let i = 0; i < bgStars.length; i++){
+    const b = bgStars[i];
+    ctx.globalAlpha = fade * b.a * (0.55 + 0.45 * Math.sin(sec * b.sp + b.ph));
+    ctx.fillRect(b.x * W, b.y * H, b.s, b.s);
+  }
+
+  /* estrellas de la galaxia */
+  ctx.globalCompositeOperation = 'lighter';
+  for (let b = 0; b < 5; b++){
+    ctx.fillStyle = BUCKET_COLORS[b];
+    ctx.globalAlpha = BUCKET_ALPHA[b] * fade;
+    const list = buckets[b];
+    for (let k = 0; k < list.length; k++){
+      const i = list[k];
+      const x0 = SX[i] * grow, y0 = SY[i] * grow, z0 = SZ[i] * grow;
+      const x1 = x0 * ca + z0 * sa, z1 = -x0 * sa + z0 * ca;
+      const d = -y0 * stl + z1 * ct;
+      const sc = D / (D + d);
+      const px = cx + x1 * sc * Rz, py = cy - (y0 * ct + z1 * stl) * sc * Rz;
+      if (px < -8 || px > W + 8 || py < -8 || py > H + 8) continue;
+      const sz = SS[i] * sc * (0.78 + 0.22 * Math.sin(sec * 2.1 + SP[i]));
+      ctx.fillRect(px - sz / 2, py - sz / 2, sz, sz);
+    }
+  }
+
+  /* estrellas con halo */
+  for (let i = 0; i < glowStars.length; i++){
+    const g = glowStars[i];
+    const x0 = g.x * grow, y0 = g.y * grow, z0 = g.z * grow;
+    const x1 = x0 * ca + z0 * sa, z1 = -x0 * sa + z0 * ca;
+    const d = -y0 * stl + z1 * ct;
+    const sc = D / (D + d);
+    const px = cx + x1 * sc * Rz, py = cy - (y0 * ct + z1 * stl) * sc * Rz;
+    const gs = g.s * sc * (1 + 0.15 * pulse) * (0.8 + 0.2 * Math.sin(sec * 1.7 + g.ph));
+    ctx.globalAlpha = g.a * fade;
+    ctx.drawImage(g.spr, px - gs / 2, py - gs / 2, gs, gs);
+  }
+
+  /* flores: ordenadas de lejos a cerca, con el núcleo en medio */
+  for (let i = 0; i < NF; i++){
+    const f = flowers[i];
+    const x0 = f.x * grow, y0 = f.y * grow, z0 = f.z * grow;
+    const x1 = x0 * ca + z0 * sa, z1 = -x0 * sa + z0 * ca;
+    const d = -y0 * stl + z1 * ct;
+    const sc = D / (D + d);
+    fx[i] = cx + x1 * sc * Rz; fy[i] = cy - (y0 * ct + z1 * stl) * sc * Rz; fd[i] = d; fsc[i] = sc;
+  }
+  order.sort((i, j) => fd[j] - fd[i]);
+
+  const coreK = 1 + 0.05 * Math.sin(sec * 0.9) + pulse * 0.25;
+  const sq = 0.8 + 0.2 * stl;
+  ctx.globalCompositeOperation = 'source-over';
+  let coreDone = false;
+  for (let n = 0; n < NF; n++){
+    const i = order[n];
+    if (!coreDone && fd[i] < 0){ drawCore(Rz, grow, fade, coreK); coreDone = true; }
+    const f = flowers[i];
+    const bl = bloomOf(f.r, grow);
+    if (bl <= 0.01) continue;
+    const rad = f.size * FSz * fsc[i] * bl * (1 + 0.05 * Math.sin(sec * 1.3 + f.ph)) * (1 + 0.28 * pulse);
+    const w = rad * FLOWER_K;
+    const dn = clamp((fd[i] + 1.1) / 2.2, 0, 1);
+    if (fx[i] < -w || fx[i] > W + w || fy[i] < -w || fy[i] > H + w) continue;
+    ctx.globalAlpha = clamp(bl * 1.5, 0, 1) * (1 - 0.42 * dn) * fade;
+    ctx.save();
+    ctx.translate(fx[i], fy[i]);
+    ctx.scale(1, sq);
+    ctx.rotate(f.phi + f.w * el);
+    ctx.drawImage(SPR_FLOWER[f.kind], -w / 2, -w / 2, w, w);
+    ctx.restore();
+  }
+  if (!coreDone) drawCore(Rz, grow, fade, coreK);
+
+  ctx.globalAlpha = 1;
+  drawPetals(dt);
+  requestAnimationFrame(frame);
+}
+
+requestAnimationFrame(frame);
+setTimeout(nextMessage, reduce ? 300 : 3300);
+})();
+</script>
+</body>
+</html>
