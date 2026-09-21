@@ -102,14 +102,143 @@ body{
 }
 .tip.gone{opacity:0}
 
+/* ---------- Carta de inicio ---------- */
+.carta{
+  position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;
+  padding:calc(env(safe-area-inset-top,0px) + 1rem) 1rem calc(env(safe-area-inset-bottom,0px) + 3.8rem);
+}
+.carta.fuera{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .9s ease,visibility 0s .9s}
+
+.rayos-wrap{
+  position:fixed;left:50%;top:50%;width:min(190vmin,1200px);height:min(190vmin,1200px);
+  transform:translate(-50%,-50%);pointer-events:none;transition:opacity 1.6s ease,transform 1.8s ease;
+}
+.rayos{
+  position:absolute;inset:0;border-radius:50%;
+  background:repeating-conic-gradient(from 0deg,rgba(255,222,120,.20) 0deg 2.5deg,transparent 2.5deg 15deg);
+  -webkit-mask-image:radial-gradient(closest-side,#000 8%,transparent 62%);
+  mask-image:radial-gradient(closest-side,#000 8%,transparent 62%);
+  animation:gira 80s linear infinite;
+}
+.abriendo .rayos-wrap{opacity:0;transform:translate(-50%,-50%) scale(1.7)}
+@keyframes gira{to{transform:rotate(360deg)}}
+
+.tarjeta{
+  position:relative;isolation:isolate;width:min(88vw,380px);height:min(68vh,500px);min-height:330px;
+  perspective:1200px;
+  animation:entra 1.4s cubic-bezier(.2,.7,.2,1) .2s both,flota 6s ease-in-out 1.6s infinite;
+}
+@keyframes entra{from{opacity:0;transform:translateY(24px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes flota{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+.halo{
+  position:absolute;inset:-30% -36%;z-index:-1;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(255,214,90,.62),rgba(255,180,40,.24) 48%,transparent 72%);
+  transition:opacity 1.2s ease;animation:latido 3.4s ease-in-out infinite;
+}
+@keyframes latido{0%,100%{transform:scale(.94)}50%{transform:scale(1.08)}}
+.borde{
+  position:absolute;inset:0;z-index:0;border-radius:10px;pointer-events:none;
+  box-shadow:0 0 0 1px rgba(255,240,180,.8),0 0 30px 6px rgba(255,205,80,.55),0 0 90px 22px rgba(255,170,40,.28);
+  transition:opacity .6s ease;
+}
+.rendija{
+  position:absolute;left:50%;top:-14%;bottom:-14%;width:70px;margin-left:-35px;z-index:0;opacity:0;pointer-events:none;
+  border-radius:50%;
+  background:radial-gradient(closest-side,rgba(255,251,224,1),rgba(255,226,130,.7) 42%,rgba(255,190,60,0) 74%);
+}
+.abre .halo,.abre .borde{opacity:0}
+.abre .rendija{animation:rendija 2s ease-out both}
+@keyframes rendija{0%{opacity:0;transform:scale(.3,1)}25%{opacity:1}100%{opacity:0;transform:scale(12,1.15)}}
+
+.papel{
+  position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.8rem;padding:1.4rem 1.5rem 3.4rem;text-align:center;border-radius:10px;cursor:pointer;color:#5a3a0c;
+  background:
+    radial-gradient(120% 80% at 50% 0%,#fffef5 0%,rgba(255,254,245,0) 60%),
+    linear-gradient(165deg,#fff6d0 0%,#ffe9a0 55%,#ffd968 100%);
+  box-shadow:inset 0 0 46px rgba(255,255,255,.75);
+  outline:1px solid rgba(160,100,10,.28);outline-offset:-10px;
+}
+.papel::before{
+  content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(150,90,10,.12) 15%,rgba(150,90,10,.12) 85%,transparent);
+  box-shadow:-10px 0 18px rgba(255,255,255,.35),10px 0 18px rgba(120,60,0,.12);
+}
+.papel::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:rgba(70,35,0,0);transition:background 1.8s ease;
+}
+.c-flor{width:54px;height:54px;flex:none;filter:drop-shadow(0 0 10px rgba(255,190,50,.7))}
+.c-para,.c-firma{
+  margin:0;line-height:1;color:#a35d05;
+  font-family:'Pinyon Script','Snell Roundhand','Segoe Script','Brush Script MT',cursive;
+}
+.c-para{font-size:clamp(2.3rem,10vw,3.1rem)}
+.c-texto{margin:0;font-style:italic;font-weight:600;font-size:clamp(1.15rem,4.9vw,1.5rem);line-height:1.4;text-wrap:balance}
+.c-firma{margin-top:.2rem;font-size:clamp(1.7rem,7vw,2.2rem)}
+
+.sello{
+  position:absolute;left:50%;bottom:-46px;z-index:3;width:96px;height:96px;margin-left:-48px;
+  border:0;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;
+  font:inherit;font-style:italic;font-weight:600;font-size:1.05rem;color:#fff4cf;text-shadow:0 1px 2px rgba(90,30,0,.7);
+  background:radial-gradient(circle at 35% 28%,#ffa347,#e2620a 52%,#a83a00 100%);
+  box-shadow:inset 0 3px 8px rgba(255,220,160,.55),inset 0 -5px 12px rgba(80,25,0,.55),0 8px 22px rgba(0,0,0,.4),0 0 34px 8px rgba(255,190,60,.5);
+  animation:latido-sello 2.4s ease-in-out infinite;
+}
+.sello .flor{width:44px;height:44px;filter:drop-shadow(0 1px 2px rgba(80,25,0,.5))}
+.sello::after{
+  content:"";position:absolute;inset:-7px;border-radius:50%;pointer-events:none;
+  border:2px solid rgba(255,214,110,.75);animation:onda 2.4s ease-out infinite;
+}
+.sello:focus-visible{outline:2px solid #fff4cf;outline-offset:6px}
+@keyframes latido-sello{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes onda{0%{transform:scale(.88);opacity:.9}100%{transform:scale(1.45);opacity:0}}
+.abriendo .sello{animation:sello-off .5s ease-in both;pointer-events:none}
+@keyframes sello-off{to{transform:scale(1.6);opacity:0}}
+
+/* La carta se parte por la mitad y sus dos hojas se abren como puertas */
+.puerta{
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;will-change:transform;
+  transition:transform 1.8s cubic-bezier(.55,.02,.25,1);
+}
+.puerta.izq{-webkit-clip-path:inset(0 50% 0 0);clip-path:inset(0 50% 0 0);transform-origin:0% 50%}
+.puerta.der{-webkit-clip-path:inset(0 0 0 50%);clip-path:inset(0 0 0 50%);transform-origin:100% 50%}
+.abre .puerta.izq{transform:rotateY(115deg)}
+.abre .puerta.der{transform:rotateY(-115deg)}
+.abre .puerta::after{background:rgba(70,35,0,.55)}
+
+/* Destello de luz cuando se abre la galaxia */
+.destello{
+  position:fixed;left:50%;top:50%;z-index:6;width:240vmax;height:240vmax;border-radius:50%;
+  pointer-events:none;opacity:0;transform:translate(-50%,-50%) scale(.04);
+  background:radial-gradient(closest-side,rgba(255,252,225,1),rgba(255,222,110,.75) 30%,rgba(255,170,40,.28) 55%,transparent 72%);
+}
+.abriendo .destello{animation:destello 2.2s cubic-bezier(.2,.7,.2,1) .45s both}
+@keyframes destello{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.04)}
+  22%{opacity:.85}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1)}
+}
+@media (max-height:520px){
+  .tarjeta{height:80vh;min-height:0;width:min(78vw,460px)}
+  .c-flor{width:38px;height:38px}
+  .c-para{font-size:1.9rem}
+  .c-texto{font-size:1rem}
+  .papel{gap:.4rem;padding-bottom:2.6rem}
+}
+
+
 /* Una sola secuencia de entrada: primero florece la galaxia, luego el título, luego el mensaje */
 @keyframes rise{
   from{opacity:0;filter:blur(10px);transform:scale(.96)}
   to{opacity:1;filter:blur(0);transform:none}
 }
 @keyframes fadein{from{opacity:0}to{opacity:1}}
-.top{animation:rise 2.2s cubic-bezier(.2,.7,.2,1) 1.6s both}
-.bottom{animation:fadein 1.6s ease 3s both}
+.top,.bottom{opacity:0}
+.bottom{visibility:hidden}
+.abierto .top{animation:rise 2.2s cubic-bezier(.2,.7,.2,1) 1.6s both}
+.abierto .bottom{visibility:visible;animation:fadein 1.6s ease 3s both}
 
 @media (max-height:520px){
   .title{font-size:clamp(2.2rem,9vw,4rem)}
@@ -117,14 +246,50 @@ body{
   .tip{display:none}
 }
 @media (prefers-reduced-motion:reduce){
-  .top,.bottom{animation:none}
+  .abierto .top,.abierto .bottom{animation:none;opacity:1}
   .msg{transition:none}
+  .tarjeta,.halo,.rayos,.sello,.sello::after{animation:none}
+  .abriendo .destello{animation:none}
+  .carta.fuera{transition:opacity .4s ease,visibility 0s .4s}
 }
 </style>
 </head>
 <body>
 <div class="sky" aria-hidden="true"></div>
 <canvas id="galaxia" role="img" aria-label="Una galaxia de flores amarillas que gira despacio"></canvas>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <path id="pet1" d="M0 -9C10 -21 9 -37 0 -47C-9 -37 -10 -21 0 -9Z"/>
+    <path id="pet2" d="M0 -8C7 -17 6 -28 0 -36C-6 -28 -7 -17 0 -8Z"/>
+    <symbol id="flor" viewBox="-50 -50 100 100">
+      <g fill="#ffc20a" stroke="#b86e00" stroke-width="1"><use href="#pet1"/><use href="#pet1" transform="rotate(30)"/><use href="#pet1" transform="rotate(60)"/><use href="#pet1" transform="rotate(90)"/><use href="#pet1" transform="rotate(120)"/><use href="#pet1" transform="rotate(150)"/><use href="#pet1" transform="rotate(180)"/><use href="#pet1" transform="rotate(210)"/><use href="#pet1" transform="rotate(240)"/><use href="#pet1" transform="rotate(270)"/><use href="#pet1" transform="rotate(300)"/><use href="#pet1" transform="rotate(330)"/></g>
+      <g fill="#ffdd4d" stroke="#d98a00" stroke-width=".8"><use href="#pet2" transform="rotate(15)"/><use href="#pet2" transform="rotate(45)"/><use href="#pet2" transform="rotate(75)"/><use href="#pet2" transform="rotate(105)"/><use href="#pet2" transform="rotate(135)"/><use href="#pet2" transform="rotate(165)"/><use href="#pet2" transform="rotate(195)"/><use href="#pet2" transform="rotate(225)"/><use href="#pet2" transform="rotate(255)"/><use href="#pet2" transform="rotate(285)"/><use href="#pet2" transform="rotate(315)"/><use href="#pet2" transform="rotate(345)"/></g>
+      <circle r="12" fill="#5a2a05"/>
+      <circle r="12" fill="none" stroke="#c98a2b" stroke-width="1.3" stroke-dasharray="1.5 3.2"/>
+      <circle r="6" fill="none" stroke="#c98a2b" stroke-width="1.3" stroke-dasharray="1.2 2.6"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="carta" class="carta" role="dialog" aria-modal="true" aria-label="Carta">
+  <div class="rayos-wrap" aria-hidden="true"><div class="rayos"></div></div>
+  <div id="tarjeta" class="tarjeta">
+    <div class="halo" aria-hidden="true"></div>
+    <div class="borde" aria-hidden="true"></div>
+    <div class="rendija" aria-hidden="true"></div>
+    <article id="papel" class="papel">
+      <svg class="c-flor" aria-hidden="true" focusable="false"><use href="#flor"/></svg>
+      <p class="c-para">Alejandra,</p>
+      <p class="c-texto">Ya que no puedo darte las flores en persona por la distancia, te dejo aquí un detalle.</p>
+      <p class="c-firma">Abel</p>
+    </article>
+    <button id="abrir" class="sello" type="button" aria-label="Abrir la carta">
+      <svg class="flor" aria-hidden="true" focusable="false"><use href="#flor"/></svg>
+      <span>Abrir</span>
+    </button>
+  </div>
+</div>
 
 <main class="ui">
   <header class="top">
@@ -137,6 +302,7 @@ body{
     <p id="tip" class="tip">Arrastra para girar la galaxia</p>
   </section>
 </main>
+<div class="destello" aria-hidden="true"></div>
 <noscript>Activa JavaScript para ver la galaxia de flores amarillas.</noscript>
 
 <script>
@@ -146,6 +312,7 @@ body{
 /* ---------- Personaliza aquí ---------- */
 const PARA = 'Alejandra';
 const DE = 'Abel';   // pon tu nombre entre comillas para firmar, por ejemplo 'Carlos'
+const CARTA = 'Ya que no puedo darte las flores en persona por la distancia, te dejo aquí un detalle.';
 const MENSAJES = [
   'El Día de las Flores Amarillas me pareció una buena excusa para hacerte esto.',
   'Nada serio, solo un detalle. Bueno, un detalle de otra galaxia.',
@@ -401,7 +568,7 @@ function nextMessage(){
 function tap(x, y){
   burst(x, y);
   pulse = 1; spinBoost += 0.8;
-  nextMessage();
+  if (ready) nextMessage();
 }
 $('next').addEventListener('click', () => {
   const b = $('next').getBoundingClientRect();
@@ -465,13 +632,34 @@ const bloomOf = (r, grow) => {
   return t <= 0 ? 0 : easeOutBack(t);
 };
 
+/* Motas de luz que flotan mientras la carta está cerrada */
+const motes = Array.from({ length: 42 }, () => ({
+  x: rnd(), y: rnd(), v: 6 + rnd() * 16, s: 10 + rnd() * 22, a: 0.25 + rnd() * 0.5, ph: rnd() * TAU,
+  spr: rnd() < 0.5 ? SPR_WARM : SPR_CREAM
+}));
+function drawMotes(dt, sec, alphaMul){
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < motes.length; i++){
+    const m = motes[i];
+    m.y -= m.v * dt / H;
+    if (m.y < -0.05){ m.y = 1.05; m.x = rnd(); }
+    const px = m.x * W + Math.sin(sec * 0.6 + m.ph) * 14, py = m.y * H;
+    ctx.globalAlpha = m.a * alphaMul * (0.6 + 0.4 * Math.sin(sec * 1.8 + m.ph));
+    ctx.drawImage(m.spr, px - m.s / 2, py - m.s / 2, m.s, m.s);
+  }
+  ctx.globalCompositeOperation = 'source-over';
+}
+
 let last = performance.now();
-const t0 = last;
+const tLoad = last;
+let started = false, ready = false, t0 = 0;
 function frame(now){
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  const el = (now - t0) / 1000, sec = now / 1000;
-  const grow = reduce ? 1 : easeOutCubic(clamp(el / 4.4, 0, 1));
-  const fade = reduce ? 1 : clamp(el / 1.1, 0, 1);
+  const sec = now / 1000;
+  const el = started ? Math.max(0, (now - t0) / 1000) : 0;
+  const grow = !started ? 0 : (reduce ? 1 : easeOutCubic(clamp(el / 4.4, 0, 1)));
+  const fade = !started ? 0 : (reduce ? 1 : clamp(el / 1.1, 0, 1));
+  const bgFade = reduce ? 1 : clamp((now - tLoad) / 1600, 0, 1);
 
   spinBoost *= Math.pow(0.15, dt);
   pulse *= Math.pow(0.03, dt);
@@ -490,9 +678,14 @@ function frame(now){
   ctx.fillStyle = '#fff6df';
   for (let i = 0; i < bgStars.length; i++){
     const b = bgStars[i];
-    ctx.globalAlpha = fade * b.a * (0.55 + 0.45 * Math.sin(sec * b.sp + b.ph));
+    ctx.globalAlpha = bgFade * b.a * (0.55 + 0.45 * Math.sin(sec * b.sp + b.ph));
     ctx.fillRect(b.x * W, b.y * H, b.s, b.s);
   }
+
+  /* motas de luz: brillan con la carta cerrada y se desvanecen al abrir */
+  const moteA = started ? clamp(1 - el / 2.4, 0, 1) : bgFade;
+  if (moteA > 0) drawMotes(dt, sec, moteA);
+  if (!started){ ctx.globalAlpha = 1; requestAnimationFrame(frame); return; }
 
   /* estrellas de la galaxia */
   ctx.globalCompositeOperation = 'lighter';
@@ -566,8 +759,52 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 
+/* ---------- Carta de inicio ---------- */
+const cartaEl = $('carta'), papelEl = $('papel'), tarjetaEl = $('tarjeta');
+cartaEl.setAttribute('aria-label', 'Carta para ' + PARA);
+papelEl.querySelector('.c-para').textContent = PARA + ',';
+papelEl.querySelector('.c-texto').textContent = CARTA;
+const firmaEl = papelEl.querySelector('.c-firma');
+if (DE) firmaEl.textContent = DE; else firmaEl.remove();
+
+function startGalaxy(){
+  if (started) return;
+  started = true; t0 = performance.now();
+  document.body.classList.add('abierto');
+  burst(cx, cy); burst(cx, cy);
+  pulse = 1;
+  setTimeout(() => { ready = true; nextMessage(); }, reduce ? 300 : 3300);
+}
+function abrirPuertas(){
+  const clone = papelEl.cloneNode(true);
+  clone.removeAttribute('id');
+  clone.setAttribute('aria-hidden', 'true');
+  clone.classList.add('puerta', 'der');
+  papelEl.classList.add('puerta', 'izq');
+  tarjetaEl.appendChild(clone);
+  void tarjetaEl.offsetWidth;
+  requestAnimationFrame(() => tarjetaEl.classList.add('abre'));
+}
+let opening = false;
+function abrirCarta(){
+  if (opening) return;
+  opening = true;
+  document.body.classList.add('abriendo');
+  $('abrir').disabled = true;
+  if (reduce){
+    cartaEl.classList.add('fuera'); startGalaxy();
+    setTimeout(() => cartaEl.remove(), 800);
+    return;
+  }
+  setTimeout(abrirPuertas, 350);
+  setTimeout(startGalaxy, 650);
+  setTimeout(() => cartaEl.classList.add('fuera'), 2500);
+  setTimeout(() => cartaEl.remove(), 3600);
+}
+$('abrir').addEventListener('click', abrirCarta);
+papelEl.addEventListener('click', abrirCarta);
+
 requestAnimationFrame(frame);
-setTimeout(nextMessage, reduce ? 300 : 3300);
 })();
 </script>
 </body>
